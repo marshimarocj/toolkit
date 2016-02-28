@@ -1,5 +1,6 @@
 import random
 import cv2
+import numpy as np
 
 class ReservoirSampling:
   def __init__(self, poolSize):
@@ -46,16 +47,19 @@ def samplePairs(recordNum, sampleNum):
 
 def isValidImg(imgFile):
   try:
-    img = cv2.imread(thumbFile)
+    if type(imgFile) is str:
+      img = cv2.imread(imgFile)
+    else:
+      img = cv2.imdecode(imgFile, cv2.CV_LOAD_IMAGE_COLOR)
   except:
     return False
     
   h, w, c = img.shape
   if h < 5 or w < 5: return False
 
-  res = cv2.imresize(img, (128, 128))
+  res = cv2.resize(img, (128, 128))
 
-  res = res.reshape((h*w, c))
+  res = res.reshape((128*128, c))
   pixelStd = np.std(res, axis=1)
   pixelSum = np.sum(res, axis=1)
   stdIdx = set(np.nonzero(pixelStd == 0)[0])
