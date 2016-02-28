@@ -54,6 +54,8 @@ def isValidImg(imgFile):
   except:
     return False
     
+  if img is None: return False
+  
   h, w, c = img.shape
   if h < 5 or w < 5: return False
 
