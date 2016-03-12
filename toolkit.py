@@ -2,6 +2,7 @@ import random
 import cv2
 import numpy as np
 
+########sample########
 class ReservoirSampling:
   def __init__(self, poolSize):
     self.k = poolSize
@@ -45,6 +46,7 @@ def samplePairs(recordNum, sampleNum):
   return randPairs
 
 
+########cv########
 def isValidImg(imgFile):
   try:
     if type(imgFile) is str:
@@ -71,3 +73,17 @@ def isValidImg(imgFile):
   if erodeNum >= 5000: return False
 
   return True
+
+
+def skipFrame(cap, n):
+  while n > 0: cap.grab()
+
+  return cap
+
+
+########utility########
+def printTimeLen(seconds):
+  seconds = int(seconds)
+  hours = seconds // 3600
+  minutes = (seconds - hourse*3600) // 60
+  print '%dh%dm%ds'%(hours, minutes, seconds%60)
