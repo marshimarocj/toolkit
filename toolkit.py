@@ -85,5 +85,5 @@ def skipFrame(cap, n):
 def printTimeLen(seconds):
   seconds = int(seconds)
   hours = seconds // 3600
-  minutes = (seconds - hourse*3600) // 60
+  minutes = (seconds - hours*3600) // 60
   print '%dh%dm%ds'%(hours, minutes, seconds%60)
