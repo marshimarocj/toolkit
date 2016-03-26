@@ -1,24 +1,31 @@
 import random
+from multiprocessing import Pool
+import subprocess
+
 import cv2
 import numpy as np
 
 ########sample########
 class ReservoirSampling:
   def __init__(self, poolSize):
-    self.k = poolSize
-    self.pool = []
-    self.n = 0
+    self._k = poolSize
+    self._pool = []
+    self._n = 0
 
   def addData(self, d):
-    if self.n < self.k:
-      self.pool.append(d)
-      self.n += 1
+    if self._n < self._k:
+      self._pool.append(d)
+      self._n += 1
       return
 
-    r = random.randint(0, self.n)
-    if r < self.k:
-      self.pool[r] = d
-    self.n += 1
+    r = random.randint(0, self._n)
+    if r < self._k:
+      self._pool[r] = d
+    self._n += 1
+
+  @property
+  def pool(self):
+    return self._pool
 
 
 def samplePairs(recordNum, sampleNum):
@@ -76,9 +83,66 @@ def isValidImg(imgFile):
 
 
 def skipFrame(cap, n):
-  while n > 0: cap.grab()
+  while n > 0: 
+    cap.grab()
+    n -= 1
 
   return cap
+
+
+def shotDetect(files, ofiles, threshold=0.3, processNum=8):
+  def ffprobe(input):
+    file = input[0]
+    outFile = input[1]
+
+    custom = '"movie=%s,select=gt(scene\,%f)"'
+
+    binary = [
+      'ffprobe',
+      '-v', 'quiet',
+      '-show_frames',
+      '-print_format', 'json=c=1',
+      '-f', 'lavfi',
+      custom%(file, outFile),
+    ]
+    cmd = ' '.join(binary + [custom%(file, threshold)])
+    proc = subprocess.Popen(cmd, shell=True, stdout=open(outFile, 'w'))
+    return proc.wait()
+
+  p = Pool(phraseNum)
+  p.map(ffprobe, zip(files, ofiles))
+
+
+def keyFrame(files, ofiles):
+  def ffprobe(input):
+    file = input[0]
+    outFile = input[1]
+
+    binary = [
+      'ffprobe',
+      '-v', 'quiet',
+      '-show_frames',
+      '-select_streams', 'v',
+      '-print_format', 'json=c=1',
+      '-show_entries', 'frame=pict_type',
+    ]
+    cmd = ' '.join(binary + [file])
+    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+    result = p.communicate()[0]
+
+    data = json.loads(result)
+    data = data['frames']
+    keyFrameNums = []
+    for i, d in enumerate(data):
+      if d['pict_type'] == 'I':
+        keyFrameNums.append(i)
+
+    json.dump(keyFrameNums, open(outFile, 'w'))
+
+    return 0
+
+  p = Pool(phraseNum)
+  p.map(ffprobe, zip(files, ofiles))
 
 
 ########utility########
@@ -87,3 +151,51 @@ def printTimeLen(seconds):
   hours = seconds // 3600
   minutes = (seconds - hours*3600) // 60
   print '%dh%dm%ds'%(hours, minutes, seconds%60)
+
+
+########data structure########
+class DisjointSet:
+  class Node:
+    def __init__(self, val):
+      self._rank = 1
+      self._val = val
+      self._parent = self
+
+    @property
+    def val(self):
+      return self.val
+
+  def __init__(self):
+    self._sets = {}
+
+  def makeSet(self, val):
+    if val not in self._sets:
+      self._sets[val] = self.Node(val)
+
+  def join(self, valLhs, valRhs):
+    lhs = self._sets[valLhs]
+    rhs = self._sets[valRhs]
+    lhsParent = self.find(lhs)
+    rhsParent = self.find(rhs)
+    if lhsParent == rhsParent:
+      return
+    parent = lhsParent
+    child = rhsParent
+    if lhsParent._rank < rhsParent._rank:
+      parent = rhsParent
+      child = lhsParent
+    child._parent = parent
+    parent._rank = max(parent._rank, child._rank+1)
+
+  def find(self, node):
+    nodes = [node]
+    while node._parent != node:
+      nodes.append(node)
+      node = node._parent
+    for i in range(1, len(nodes)):
+      nodes[-i]._parent = nodes[-i+1]._parent
+
+    return nodes[0]._parent
+
+  def findVal(self, val):
+    return self.find(self._sets[val])
