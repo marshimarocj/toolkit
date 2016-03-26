@@ -113,7 +113,7 @@ def shotDetect(files, ofiles, threshold=0.3, processNum=8):
   p.map(ffprobe, zip(files, ofiles))
 
 
-def keyFrame(files, ofiles):
+def keyFrame(files, ofiles, processNum=8):
   def ffprobe(input):
     file = input[0]
     outFile = input[1]
@@ -141,7 +141,7 @@ def keyFrame(files, ofiles):
 
     return 0
 
-  p = Pool(phraseNum)
+  p = Pool(processNum)
   p.map(ffprobe, zip(files, ofiles))
 
 
