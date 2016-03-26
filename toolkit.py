@@ -90,59 +90,65 @@ def skipFrame(cap, n):
   return cap
 
 
+def _shotDetect(input):
+  file = input[0]
+  outFile = input[1]
+  threshold = input[2]
+
+  custom = '"movie=%s,select=gt(scene\,%f)"'
+
+  binary = [
+    'ffprobe',
+    '-v', 'quiet',
+    '-show_frames',
+    '-print_format', 'json=c=1',
+    '-f', 'lavfi',
+    custom%(file, outFile),
+  ]
+  cmd = ' '.join(binary + [custom%(file, threshold)])
+  proc = subprocess.Popen(cmd, shell=True, stdout=open(outFile, 'w'))
+  return proc.wait()
+
+
 def shotDetect(files, ofiles, threshold=0.3, processNum=8):
-  def ffprobe(input):
-    file = input[0]
-    outFile = input[1]
-
-    custom = '"movie=%s,select=gt(scene\,%f)"'
-
-    binary = [
-      'ffprobe',
-      '-v', 'quiet',
-      '-show_frames',
-      '-print_format', 'json=c=1',
-      '-f', 'lavfi',
-      custom%(file, outFile),
-    ]
-    cmd = ' '.join(binary + [custom%(file, threshold)])
-    proc = subprocess.Popen(cmd, shell=True, stdout=open(outFile, 'w'))
-    return proc.wait()
-
   p = Pool(phraseNum)
-  p.map(ffprobe, zip(files, ofiles))
+  inputs = []
+  for f in range(len(files)):
+    inputs.append([files[f], ofiles[f], threshold])
+  p.map(_shotDetect, inputs)
+
+
+def _keyFrame(input):
+  file = input[0]
+  outFile = input[1]
+
+  binary = [
+    'ffprobe',
+    '-v', 'quiet',
+    '-show_frames',
+    '-select_streams', 'v',
+    '-print_format', 'json=c=1',
+    '-show_entries', 'frame=pict_type',
+  ]
+  cmd = ' '.join(binary + [file])
+  p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
+  result = p.communicate()[0]
+
+  data = json.loads(result)
+  data = data['frames']
+  keyFrameNums = []
+  for i, d in enumerate(data):
+    if d['pict_type'] == 'I':
+      keyFrameNums.append(i)
+
+  json.dump(keyFrameNums, open(outFile, 'w'))
+
+  return 0
 
 
 def keyFrame(files, ofiles, processNum=8):
-  def ffprobe(input):
-    file = input[0]
-    outFile = input[1]
-
-    binary = [
-      'ffprobe',
-      '-v', 'quiet',
-      '-show_frames',
-      '-select_streams', 'v',
-      '-print_format', 'json=c=1',
-      '-show_entries', 'frame=pict_type',
-    ]
-    cmd = ' '.join(binary + [file])
-    p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE)
-    result = p.communicate()[0]
-
-    data = json.loads(result)
-    data = data['frames']
-    keyFrameNums = []
-    for i, d in enumerate(data):
-      if d['pict_type'] == 'I':
-        keyFrameNums.append(i)
-
-    json.dump(keyFrameNums, open(outFile, 'w'))
-
-    return 0
-
   p = Pool(processNum)
-  p.map(ffprobe, zip(files, ofiles))
+  p.map(_keyFrame, zip(files, ofiles))
 
 
 ########utility########
