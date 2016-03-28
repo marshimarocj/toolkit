@@ -84,7 +84,8 @@ def isValidImg(imgFile):
 
 
 def skipFrame(cap, n):
-  while n > 0: 
+  while n > 0:
+    print n
     cap.grab()
     n -= 1
 
