@@ -102,6 +102,7 @@ def _convertFormat(input):
     '-acodec', 'copy',
     outFile
   ]
+  cmd = ' '.join(binary)
   proc = subprocess.Popen(cmd, shell=True)
   return proc.wait()
 
