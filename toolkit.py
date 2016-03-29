@@ -91,6 +91,27 @@ def skipFrame(cap, n):
   return cap
 
 
+def _convertFormat(input):
+  file = input[0]
+  outFile = input[1]
+
+  binary = [
+    'ffmpeg',
+    '-i', file,
+    '-vcodec', 'copy',
+    '-acodec', 'copy',
+    outFile
+  ]
+  proc = subprocess.Popen(cmd, shell=True)
+  return proc.wait()
+
+
+def convertFormat(files, ofiles, processNum=8):
+  p = Pool(processNum)
+  inputs = zip(files, ofiles)
+  p.map(_convertFormat, inputs)
+
+
 def _shotDetect(input):
   file = input[0]
   outFile = input[1]
@@ -112,7 +133,7 @@ def _shotDetect(input):
 
 
 def shotDetect(files, ofiles, threshold=0.3, processNum=8):
-  p = Pool(phraseNum)
+  p = Pool(processNum)
   inputs = []
   for f in range(len(files)):
     inputs.append([files[f], ofiles[f], threshold])
@@ -143,6 +164,16 @@ def _keyFrame(input):
       keyFrameNums.append(i)
 
   json.dump(keyFrameNums, open(outFile, 'w'))
+
+  if len(input) == 3:
+    outPrefix = input[2]
+    cap = cv2.VideoCapture(file)
+    for i in range(1, len(ke11yFrameNums)):
+      gap = keyFrameNums[i] - keyFrameNums[i-1]
+      skip(cap, gap)
+      flag, img = cap.retrieve()
+      outFile = '%s-%d.jpg'%(outPrefix, keyFrameNums[i])
+      cv2.imwrite(outFile, img)
 
   return 0
 
