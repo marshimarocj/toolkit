@@ -98,8 +98,8 @@ def _convertFormat(input):
   binary = [
     'ffmpeg',
     '-i', file,
-    '-vcodec', 'copy',
-    '-acodec', 'copy',
+    # '-vcodec', 'copy',
+    # '-acodec', 'copy',
     outFile
   ]
   cmd = ' '.join(binary)
