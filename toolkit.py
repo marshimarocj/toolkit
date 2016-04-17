@@ -6,7 +6,13 @@ import json
 import cv2
 import numpy as np
 
-########sample########
+  ####     ##    #    #  #####   #       ######
+ #        #  #   ##  ##  #    #  #       #
+  ####   #    #  # ## #  #    #  #       #####
+      #  ######  #    #  #####   #       #
+ #    #  #    #  #    #  #       #       #
+  ####   #    #  #    #  #       ######  ######
+
 class ReservoirSampling:
   def __init__(self, poolSize):
     self._k = poolSize
@@ -53,8 +59,13 @@ def samplePairs(recordNum, sampleNum):
 
   return randPairs
 
+  ####   #    #
+ #    #  #    #
+ #       #    #
+ #       #    #
+ #    #   #  #
+  ####     ##
 
-########cv########
 def isValidImg(imgFile):
   try:
     if type(imgFile) is str:
@@ -98,8 +109,6 @@ def _convertFormat(input):
   binary = [
     'ffmpeg',
     '-i', file,
-    # '-vcodec', 'copy',
-    # '-acodec', 'copy',
     outFile
   ]
   cmd = ' '.join(binary)
@@ -184,7 +193,13 @@ def keyFrame(files, ofiles, processNum=8):
   p.map(_keyFrame, zip(files, ofiles))
 
 
-########utility########
+ #    #   #####     #    #
+ #    #     #       #    #
+ #    #     #       #    #
+ #    #     #       #    #
+ #    #     #       #    #
+  ####      #       #    ######
+
 def printTimeLen(seconds):
   seconds = int(seconds)
   hours = seconds // 3600
@@ -192,7 +207,13 @@ def printTimeLen(seconds):
   print '%dh%dm%ds'%(hours, minutes, seconds%60)
 
 
-########data structure########
+ #####    ####
+ #    #  #
+ #    #   ####
+ #    #       #
+ #    #  #    #
+ #####    ####
+ 
 class DisjointSet:
   class Node:
     def __init__(self, val):
