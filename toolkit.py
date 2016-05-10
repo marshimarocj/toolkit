@@ -48,8 +48,8 @@ def samplePairs(recordNum, sampleNum):
 
   cumSum = 0
   cumPos = []
-  for i in range(phraseNum):
-    cumSum += phraseNum-i-1
+  for i in range(recordNum):
+    cumSum += recordNum-i-1
     cumPos.append(cumSum)
 
   randPairs = []
