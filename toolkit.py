@@ -2,6 +2,8 @@ import random
 from multiprocessing import Pool
 import subprocess
 import json
+from functools import wraps
+import time
 
 import cv2
 import numpy as np
@@ -204,8 +206,17 @@ def printTimeLen(seconds):
   seconds = int(seconds)
   hours = seconds // 3600
   minutes = (seconds - hours*3600) // 60
-  print '%dh%dm%ds'%(hours, minutes, seconds%60)
+  print '%02d:%02d:%02d'%(hours, minutes, seconds%60)
 
+def timefn(fn):
+  @wraps
+  def measureTime(*args, **kwargs):
+    t1 = time.time()
+    fn(*args, **kwargs)
+    t2 = time.time()
+    print fn.func_name + ':' + str(t2-t1) + 's'
+    return t2-t1
+  return measureTime
 
  #####    ####
  #    #  #
