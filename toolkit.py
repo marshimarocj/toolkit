@@ -204,10 +204,11 @@ def keyFrame(files, ofiles, processNum=8):
   ####      #       #    ######
 
 def printTimeLen(seconds):
-  seconds = int(seconds)
-  hours = seconds // 3600
-  minutes = (seconds - hours*3600) // 60
-  print '%02d:%02d:%02d'%(hours, minutes, seconds%60)
+  iseconds = int(seconds)
+  hours = iseconds // 3600
+  minutes = (iseconds - hours*3600) // 60
+  return '%02d:%02d:%02d:%03f'%(hours, minutes, iseconds%60, seconds-iseconds)
+
 
 def timefn(fn):
   @wraps
