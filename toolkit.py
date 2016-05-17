@@ -96,6 +96,17 @@ def isValidImg(imgFile):
 
   return True
 
+def isBlack(imgFile):
+  img = cv2.imread(imgFile)
+  gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+  blackNum = np.sum(gray < 25)
+  totalNum = gray.shape[0] * gray.shape[1]
+  # print blackNum / float(totalNum)
+  if totalNum * 0.5 < blackNum:
+    return True
+  else:
+    return False
+
 
 def skipFrame(cap, n):
   while n > 0:
