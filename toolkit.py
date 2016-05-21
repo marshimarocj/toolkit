@@ -247,7 +247,7 @@ class Prefetcher(object):
     t.start()
 
   def get(self):
-    return q.get()
+    return self.q.get()
 
 
  #####    ####
