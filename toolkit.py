@@ -246,7 +246,7 @@ class Prefetcher(object):
     t = threading.Thread(target=fn, args=(self.q))
     t.start()
 
-  def get():
+  def get(self):
     return q.get()
 
 
