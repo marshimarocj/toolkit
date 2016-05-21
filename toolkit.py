@@ -1,7 +1,7 @@
 import random
 from multiprocessing import Pool
 import subprocess
-import Queue
+from Queue import Queue
 import threading
 import json
 from functools import wraps
