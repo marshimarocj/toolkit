@@ -235,12 +235,10 @@ def timefn(fn):
 
 
 class Prefetcher(object):
-  fn = None
   q = None
 
   # fn is a producer function with parameter q
   def __init__(self, fn, size):
-    self.fn = fn
     self.q = Queue(size)
 
     t = threading.Thread(target=fn, args=(self.q))
