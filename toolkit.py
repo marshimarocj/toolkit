@@ -1,6 +1,8 @@
 import random
 from multiprocessing import Pool
 import subprocess
+import Queue
+import threading
 import json
 from functools import wraps
 import time
@@ -230,6 +232,23 @@ def timefn(fn):
     print fn.func_name + ':' + str(t2-t1) + 's'
     return t2-t1
   return measureTime
+
+
+class Prefetcher(object):
+  fn = None
+  q = None
+
+  # fn is a producer function with parameter q
+  def __init__(self, fn, size):
+    self.fn = fn
+    self.q = Queue(size)
+
+    t = threading.Thread(target=fn, args=(self.q))
+    t.start()
+
+  def get():
+    return q.get()
+
 
  #####    ####
  #    #  #
