@@ -1,11 +1,13 @@
-import random
+import sys
+import os
 from multiprocessing import Pool
 import subprocess
 from Queue import Queue
 import threading
-import json
-from functools import wraps
 import time
+
+import random
+import json
 import bisect
 
 import cv2
@@ -19,28 +21,32 @@ import numpy as np
   ####   #    #  #    #  #       ######  ######
 
 class ReservoirSampling:
+
   def __init__(self, poolSize):
+
     self._k = poolSize
     self._pool = []
     self._n = 0
 
   def addData(self, d):
+
     if self._n < self._k:
       self._pool.append(d)
       self._n += 1
-      return
-
-    r = random.randint(0, self._n)
-    if r < self._k:
-      self._pool[r] = d
-    self._n += 1
+    else:
+      r = random.randint(0, self._n)
+      if r < self._k:
+        self._pool[r] = d
+      self._n += 1
 
   @property
   def pool(self):
+
     return self._pool
 
 
 def samplePairs(recordNum, sampleNum):
+
   pairMax = recordNum * (recordNum-1) / 2
 
   rands = set()
@@ -64,6 +70,7 @@ def samplePairs(recordNum, sampleNum):
 
   return randPairs
 
+
   ####   #    #
  #    #  #    #
  #       #    #
@@ -72,6 +79,7 @@ def samplePairs(recordNum, sampleNum):
   ####     ##
 
 def isValidImg(imgFile):
+
   try:
     if type(imgFile) is str:
       img = cv2.imread(imgFile)
@@ -94,11 +102,14 @@ def isValidImg(imgFile):
   sumIdx = set(np.nonzero(pixelSum == 128*3)[0])
   erodeNum = len(stdIdx and sumIdx)
 
+  # TODO: It's better to be substituted by fraction later
   if erodeNum >= 5000: return False
 
   return True
 
+
 def isBlack(imgFile):
+
   img = cv2.imread(imgFile)
   gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
   blackNum = np.sum(gray < 25)
@@ -111,6 +122,7 @@ def isBlack(imgFile):
 
 
 def skipFrame(cap, n):
+
   while n > 0:
     cap.grab()
     n -= 1
@@ -119,6 +131,7 @@ def skipFrame(cap, n):
 
 
 def _convertFormat(input):
+
   file = input[0]
   outFile = input[1]
 
@@ -129,16 +142,19 @@ def _convertFormat(input):
   ]
   cmd = ' '.join(binary)
   proc = subprocess.Popen(cmd, shell=True)
+
   return proc.wait()
 
 
 def convertFormat(files, ofiles, processNum=8):
+
   p = Pool(processNum)
   inputs = zip(files, ofiles)
   p.map(_convertFormat, inputs)
 
 
 def _shotDetect(input):
+
   file = input[0]
   outFile = input[1]
   threshold = input[2]
@@ -155,10 +171,12 @@ def _shotDetect(input):
   ]
   cmd = ' '.join(binary + [custom%(file, threshold)])
   proc = subprocess.Popen(cmd, shell=True, stdout=open(outFile, 'w'))
+
   return proc.wait()
 
 
 def shotDetect(files, ofiles, threshold=0.3, processNum=8):
+
   p = Pool(processNum)
   inputs = []
   for f in range(len(files)):
@@ -167,6 +185,7 @@ def shotDetect(files, ofiles, threshold=0.3, processNum=8):
 
 
 def _keyFrame(input):
+
   file = input[0]
   outFile = input[1]
 
@@ -205,6 +224,7 @@ def _keyFrame(input):
 
 
 def keyFrame(files, ofiles, processNum=8):
+
   p = Pool(processNum)
   p.map(_keyFrame, zip(files, ofiles))
 
@@ -217,35 +237,28 @@ def keyFrame(files, ofiles, processNum=8):
   ####      #       #    ######
 
 def printTimeLen(seconds):
+
   iseconds = int(seconds)
   hours = iseconds // 3600
   minutes = (iseconds - hours*3600) // 60
+
   return '%02d:%02d:%02d:%03f'%(hours, minutes, iseconds%60, seconds-iseconds)
-
-
-def timefn(fn):
-  @wraps
-  def measureTime(*args, **kwargs):
-    t1 = time.time()
-    fn(*args, **kwargs)
-    t2 = time.time()
-    print fn.func_name + ':' + str(t2-t1) + 's'
-    return t2-t1
-  return measureTime
 
 
 class Prefetcher(object):
   q = None
 
-  # fn is a producer function with parameter q
+  # fn should be a producer function with parameter q
   def __init__(self, fn, size):
+
     self.q = Queue(size)
 
     t = threading.Thread(target=fn, args=(self.q,))
-    t.daemon = True
+    t.daemon = True # so that it could be Ctrl+C
     t.start()
 
   def get(self):
+
     return self.q.get()
 
 
@@ -257,47 +270,93 @@ class Prefetcher(object):
  #####    ####
  
 class DisjointSet:
+
   class Node:
+
+    _rank = -1
+    _val = None
+    _parent = None
+
+
     def __init__(self, val):
+
       self._rank = 1
       self._val = val
       self._parent = self
 
+
     @property
     def val(self):
+
       return self.val
 
+
+  _sets = {}
+
+
   def __init__(self):
+
     self._sets = {}
 
+
   def makeSet(self, val):
+
     if val not in self._sets:
       self._sets[val] = self.Node(val)
 
+
   def join(self, valLhs, valRhs):
+
     lhs = self._sets[valLhs]
     rhs = self._sets[valRhs]
     lhsParent = self.find(lhs)
     rhsParent = self.find(rhs)
+
     if lhsParent == rhsParent:
       return
+
     parent = lhsParent
     child = rhsParent
-    if lhsParent._rank < rhsParent._rank:
+    if lhsParent._rank < rhsParent._rank: # path compress
       parent = rhsParent
       child = lhsParent
     child._parent = parent
     parent._rank = max(parent._rank, child._rank+1)
 
+
   def find(self, node):
+
     nodes = [node]
     while node._parent != node:
       nodes.append(node)
       node = node._parent
+
+    # path compress trick
     for i in range(1, len(nodes)):
       nodes[-i]._parent = nodes[-i+1]._parent
 
     return nodes[0]._parent
 
   def findVal(self, val):
+
     return self.find(self._sets[val])
+
+
+  ####    #   #   ####
+ #         # #   #
+  ####      #     ####
+      #     #         #
+ #    #     #    #    #
+  ####      #     ####
+
+# WARN: only process the 'y' branch, does nothing for else
+def dirInteractiveChecker(dir):
+
+  if not os.path.exists(dir):
+    print '%s: not exists!'%(dir)
+    print 'would you like to create "%s"?(y/n)'%(dir)
+    line = sys.stdin.readline()
+    line = line.strip()
+
+    if line == 'y':
+      os.makedirs(dir)
