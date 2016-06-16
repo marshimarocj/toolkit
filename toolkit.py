@@ -1,10 +1,10 @@
 import sys
 import os
+import logging
 from multiprocessing import Pool
 import subprocess
 from Queue import Queue
 import threading
-import time
 
 import random
 import json
@@ -260,6 +260,28 @@ class Prefetcher(object):
   def get(self):
 
     return self.q.get()
+
+
+def set_logger(name, log_path=None):
+
+  logger = logging.getLogger(name)
+  logger.setLevel(logging.DEBUG)
+
+  console = logging.StreamHandler()
+  console.setLevel(logging.DEBUG)
+  console.setFormatter(logging.Formatter('%(asctime)s %(message)s'))
+  logger.addHandler(console)
+
+  if log_path is not None:
+    if os.path.exists(log_path):
+      os.remove(log_path)
+
+    logfile = logging.FileHandler(log_path)
+    logfile.setLevel(logging.INFO)
+    logfile.setFormatter(logging.Formatter('%(asctime)s %(message)s'))
+    logger.addHandler(logfile)
+
+  return logger
 
 
  #####    ####
