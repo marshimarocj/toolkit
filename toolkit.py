@@ -234,6 +234,31 @@ def keyFrame(files, ofiles, processNum=8):
   p.map(_keyFrame, zip(files, ofiles))
 
 
+def packImgs2Gif(imgFiles, outFile, duration, 
+    maxHeight=-1, compress=True):
+  imgs = []
+  for imgFile in imgFiles:
+    img = Image.open(imgFile)
+    width, height = img.size
+    if maxHeight != -1:
+      scale = maxHeight / float(height)
+      maxWidth = int(width*scale)
+      size = (maxWidth, maxHeight)
+      img.thumbnail(size)
+    imgs.append(img)
+  writeGif(outFile, imgs, duration=duration, dither=0)
+
+  if compress:
+    binary = [
+      'convert', outFile, 
+      '-coalesce', '-layers', 'OptimizeFrame', 
+      outFile]
+    cmd = ' '.join(binary)
+    proc = subprocess.Popen(cmd, shell=True)
+
+    proc.wait()
+
+
  #    #   #####     #    #
  #    #     #       #    #
  #    #     #       #    #
