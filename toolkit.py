@@ -295,10 +295,10 @@ class Prefetcher(object):
 def set_logger(name, log_path=None):
 
   logger = logging.getLogger(name)
-  logger.setLevel(logging.DEBUG)
+  logger.setLevel(logging.INFO)
 
   console = logging.StreamHandler()
-  console.setLevel(logging.DEBUG)
+  console.setLevel(logging.INFO)
   console.setFormatter(logging.Formatter('%(asctime)s %(message)s'))
   logger.addHandler(console)
 
