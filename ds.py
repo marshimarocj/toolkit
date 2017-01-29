@@ -62,6 +62,7 @@ class DoubleLinkedList(object):
     self.head.next = self.tail
     self.tail.prev = self.head
     self.cur = self.head
+    self.size = 0
 
     if arr is not None:
       self.init_from_list(arr)
@@ -76,6 +77,8 @@ class DoubleLinkedList(object):
     node.next = self.tail
     self.tail.prev = node
 
+    self.size += 1
+
   def insert_to_head(self, data):
     node = self.Node(data)
     next = self.head.next
@@ -86,13 +89,17 @@ class DoubleLinkedList(object):
     node.prev = self.head
     self.head.next = node
 
-  # after remove, the cur points to the removed node
+    self.size += 1
+
+  # N.B. after remove, the cur points to the removed node
+  # thus, next() and prev() still functions well after remove_cur()
   def remove_cur(self): 
     self._remove(self.cur)
 
   def _remove(self, node):
     node.prev.next = node.next
     node.next.prev = node.prev
+    self.size -= 1
 
   def init_from_list(self, arr):
     for d in arr:
@@ -123,3 +130,27 @@ class DoubleLinkedList(object):
 
   def is_empty(self):
     return self.head.next == self.tail
+
+  def pop_front(self):
+    if self.head.next != self.tail:
+      self.head.next = self.head.next.next
+      self.head.next.prev = self.head
+      self.size -= 1
+    else:
+      raise Exception("""try to pop_front empty DoubleLinkedList""")
+
+  def pop_back(self):
+    if self.tail.prev != self.head:
+      self.tail.prev = self.tail.prev.prev
+      self.tail.prev.next = self.tail
+      self.size -= 1
+    else:
+      raise Exception("""try pop_tail empty DoubleLinkedList""")
+
+  def front(self):
+    node = self.head.next
+    return node.data
+
+  def back(self):
+    node = self.tail.prev
+    return node.data

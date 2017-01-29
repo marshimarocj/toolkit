@@ -49,10 +49,17 @@ class ScpHelper(object):
       dest = 'vid-gpu1.inf.cs.cmu.edu'
       username = 'jiac'
     elif name == 'xcl':
-      dest = '128.2.219.108'
+      dest = 'vid-gpu4.inf.cs.cmu.edu'
       username = 'informedia'
+    elif name == 'hl':
+      dest = 'vid-gpu6.inf.cs.cmu.edu'
+      username = 'jiaac'
 
     return key_file, dest, port, username
+
+  def connect_shortcut(self, name):
+    key_file, dest, port, username = self.shortcut(name)
+    self.connect(key_file, dest, port, username)
 
   def get(self, remote_file, local_file, recursive=False):
     self.scp.get(remote_file, local_file, recursive=recursive)
