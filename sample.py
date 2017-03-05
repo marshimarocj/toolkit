@@ -41,6 +41,7 @@ def samplePairs(recordNum, sampleNum):
   randPairs = []
   for r in rands:
     row = bisect.bisect_left(cumPos, r)
+    print r, row, cumPos
     i = row
     j = r-cumPos[i-1]+i+1 if i > 0 else r+i+1
     randPairs.append((i, j))
