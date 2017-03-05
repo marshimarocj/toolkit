@@ -24,6 +24,7 @@ class ReservoirSampling:
 
 def samplePairs(recordNum, sampleNum):
   pairMax = recordNum * (recordNum-1) / 2
+  sampleNum = min(pairMax-1, sampleNum)
 
   rands = set()
   while len(rands) < sampleNum:

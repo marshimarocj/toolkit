@@ -28,9 +28,12 @@ class ScpHelper(object):
     if name == 'sun':
       dest = '202.112.113.219'
       username = 'qjin'
+    elif name == 'uranus':
+      dest = '202.112.113.30'
+      username = 'jiac'
     elif name == 'mercurial':
       dest = '202.112.113.209'
-      username = 'chenjia'
+      username = 'qjin'
     elif name == 'jupiter':
       dest = '222.29.195.82'
       port = 222
