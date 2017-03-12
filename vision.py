@@ -7,7 +7,7 @@ import numpy as np
 from PIL import Image
 from images2gif import writeGif
 
-def isValidImg(imgFile):
+def isValidImg(imgFile, check_erode=True):
   try:
     if type(imgFile) is str:
       img = cv2.imread(imgFile)
@@ -21,17 +21,18 @@ def isValidImg(imgFile):
   h, w, c = img.shape
   if h < 5 or w < 5: return False
 
-  res = cv2.resize(img, (128, 128))
+  if check_erode:
+    res = cv2.resize(img, (128, 128))
 
-  res = res.reshape((128*128, c))
-  pixelStd = np.std(res, axis=1)
-  pixelSum = np.sum(res, axis=1)
-  stdIdx = set(np.nonzero(pixelStd == 0)[0])
-  sumIdx = set(np.nonzero(pixelSum == 128*3)[0])
-  erodeNum = len(stdIdx and sumIdx)
+    res = res.reshape((128*128, c))
+    pixelStd = np.std(res, axis=1)
+    pixelSum = np.sum(res, axis=1)
+    stdIdx = set(np.nonzero(pixelStd == 0)[0])
+    sumIdx = set(np.nonzero(pixelSum == 128*3)[0])
+    erodeNum = len(stdIdx and sumIdx)
 
-  # TODO: It's better to be substituted by fraction later
-  if erodeNum >= 5000: return False
+    # TODO: It's better to be substituted by fraction later
+    if erodeNum >= 5000: return False
 
   return True
 
