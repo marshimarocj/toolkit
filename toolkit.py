@@ -10,13 +10,13 @@ import random
 import json
 import bisect
 
-import cv2
-import numpy as np
-import paramiko
-from paramiko import SSHClient
-from scp import SCPClient
-from PIL import Image
-from images2gif import writeGif
+#import cv2
+#import numpy as np
+#import paramiko
+#from paramiko import SSHClient
+#from scp import SCPClient
+#from PIL import Image
+#from images2gif import writeGif
 
   ####     ##    #    #  #####   #       ######
  #        #  #   ##  ##  #    #  #       #
