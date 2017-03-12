@@ -418,7 +418,7 @@ class SCPClient(object):
         try:
             os.utime(path, self._utime)
             self._utime = None
-            os.chmod(path, mode)
+            # os.chmod(path, mode)
             # should we notify the other end?
         finally:
             file_hdl.close()
