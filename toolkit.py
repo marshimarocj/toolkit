@@ -5,7 +5,6 @@ import logging
 from Queue import Queue
 import threading
 
-
 def printTimeLen(seconds):
   iseconds = int(seconds)
   hours = iseconds // 3600
