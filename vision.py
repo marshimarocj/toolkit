@@ -4,8 +4,8 @@ import json
 
 import cv2
 import numpy as np
-from PIL import Image
-from images2gif import writeGif
+# from PIL import Image
+# from images2gif import writeGif
 
 def isValidImg(imgFile, check_erode=True):
   try:
@@ -150,50 +150,50 @@ def keyFrame(files, ofiles, processNum=8):
   p.map(_keyFrame, zip(files, ofiles))
 
 
-def packImgFiles2Gif(imgFiles, outFile, duration, 
-    maxHeight=-1, compress=True):
-  imgs = []
-  for imgFile in imgFiles:
-    img = Image.open(imgFile)
-    width, height = img.size
-    if maxHeight != -1:
-      scale = maxHeight / float(height)
-      maxWidth = int(width*scale)
-      size = (maxWidth, maxHeight)
-      img.thumbnail(size)
-    imgs.append(img)
-  writeGif(outFile, imgs, duration=duration, dither=0)
+# def packImgFiles2Gif(imgFiles, outFile, duration, 
+#     maxHeight=-1, compress=True):
+#   imgs = []
+#   for imgFile in imgFiles:
+#     img = Image.open(imgFile)
+#     width, height = img.size
+#     if maxHeight != -1:
+#       scale = maxHeight / float(height)
+#       maxWidth = int(width*scale)
+#       size = (maxWidth, maxHeight)
+#       img.thumbnail(size)
+#     imgs.append(img)
+#   writeGif(outFile, imgs, duration=duration, dither=0)
 
-  if compress:
-    binary = [
-      'convert', outFile, 
-      '-coalesce', '-layers', 'OptimizeFrame', 
-      outFile]
-    cmd = ' '.join(binary)
-    proc = subprocess.Popen(cmd, shell=True)
+#   if compress:
+#     binary = [
+#       'convert', outFile, 
+#       '-coalesce', '-layers', 'OptimizeFrame', 
+#       outFile]
+#     cmd = ' '.join(binary)
+#     proc = subprocess.Popen(cmd, shell=True)
 
-    proc.wait()
+#     proc.wait()
 
 
-def packImgs2Gif(imgs, outFile, duration, 
-    maxHeight=-1, compress=True):
-  _imgs = []
-  for img in imgs:
-    width, height = img.size
-    if maxHeight != -1:
-      scale = maxHeight / float(height)
-      maxWidth = int(width*scale)
-      size = (maxWidth, maxHeight)
-      img.thumbnail(size)
-    _imgs.append(img)
-  writeGif(outFile, _imgs, duration=duration, dither=0)
+# def packImgs2Gif(imgs, outFile, duration, 
+#     maxHeight=-1, compress=True):
+#   _imgs = []
+#   for img in imgs:
+#     width, height = img.size
+#     if maxHeight != -1:
+#       scale = maxHeight / float(height)
+#       maxWidth = int(width*scale)
+#       size = (maxWidth, maxHeight)
+#       img.thumbnail(size)
+#     _imgs.append(img)
+#   writeGif(outFile, _imgs, duration=duration, dither=0)
 
-  if compress:
-    binary = [
-      'convert', outFile, 
-      '-coalesce', '-layers', 'OptimizeFrame', 
-      outFile]
-    cmd = ' '.join(binary)
-    proc = subprocess.Popen(cmd, shell=True)
+#   if compress:
+#     binary = [
+#       'convert', outFile, 
+#       '-coalesce', '-layers', 'OptimizeFrame', 
+#       outFile]
+#     cmd = ' '.join(binary)
+#     proc = subprocess.Popen(cmd, shell=True)
 
-    proc.wait()
+#     proc.wait()
