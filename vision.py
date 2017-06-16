@@ -4,7 +4,7 @@ import json
 
 import cv2
 import numpy as np
-# from PIL import Image
+# from PIL mport Image
 # from images2gif import writeGif
 
 def isValidImg(imgFile, check_erode=True):
