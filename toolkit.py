@@ -10,7 +10,7 @@ def printTimeLen(seconds):
   hours = iseconds // 3600
   minutes = (iseconds - hours*3600) // 60
 
-  return '%02d:%02d:%02d:%03f'%(hours, minutes, iseconds%60, seconds-iseconds)
+  return '%02d:%02d:%02d:%.3f'%(hours, minutes, iseconds%60, seconds-iseconds)
 
 
 # proved to be useless
