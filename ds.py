@@ -1,4 +1,4 @@
-class DisjointSet:
+class DisjointSet(object):
   class Node:
     def __init__(self, val):
       self._rank = 1
@@ -154,3 +154,61 @@ class DoubleLinkedList(object):
   def back(self):
     node = self.tail.prev
     return node.data
+
+
+# the data format is tuple and the 1st element is the key
+# it is a max-heap
+class Heap(object):
+  def __init__(self):
+    self._data = [(None,)]
+
+  @property
+  def data(self):
+    return self._data
+
+  def len(self):
+    return len(self._data) - 1
+
+  def _heapify(self, i):
+    while i < len(self._data):
+      l = i*2
+      r = i*2+1
+      largest = i
+      if l < len(self._data) and self._data[l][0] > self._data[largest][0]:
+        largest = l
+      if r < len(self._data) and self._data[r][0] > self._data[largest][0]:
+        largest = r
+      if largest != i:
+        tmp = self._data[i]
+        self._data[i] = self._data[largest]
+        self._data[largest] = tmp
+        i = largest
+      else:
+        break
+
+  def build_heap(self, data):
+    self._data = [(None,)] + data
+    i = len(data)/2
+    while i > 0:
+      self._heapify(i)
+      i -= 1
+
+  def is_empty(self):
+    return len(self._data) == 1
+
+  def max(self):
+    assert len(self._data) > 1
+    return self._data[1]
+
+  def pop(self):
+    self._data[1] = self._data[-1]
+    self._data.pop()
+    self._heapify(1)
+
+  def push(self, d):
+    i = len(self._data)
+    self._data.append((None,))
+    while i > 1 and self._data[i/2][0] < d[0]:
+      self._data[i] = self._data[i/2]
+      i /= 2
+    self._data[i] = d
