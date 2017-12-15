@@ -164,8 +164,9 @@ class Heap(object):
 
   @property
   def data(self):
-    return self._data
+    return self._data[1:]
 
+  @property
   def len(self):
     return len(self._data) - 1
 
@@ -188,7 +189,7 @@ class Heap(object):
 
   def build_heap(self, data):
     self._data = [(None,)] + data
-    i = len(data)/2
+    i = len(self._data)/2
     while i > 0:
       self._heapify(i)
       i -= 1
