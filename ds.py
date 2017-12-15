@@ -188,7 +188,8 @@ class Heap(object):
         break
 
   def build_heap(self, data):
-    self._data = [(None,)] + data
+    if data is not None:
+      self._data = [(None,)] + data
     i = len(self._data)/2
     while i > 0:
       self._heapify(i)
