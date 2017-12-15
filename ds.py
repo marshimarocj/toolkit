@@ -190,7 +190,7 @@ class Heap(object):
   def build_heap(self, data):
     if data is not None:
       self._data = [(None,)] + data
-    i = len(self._data)/2
+    i = len(data)/2
     while i > 0:
       self._heapify(i)
       i -= 1
